@@ -1,0 +1,12 @@
+name: FasterAscend
+version: 1.0-BETA
+main: dev.timecoding.fasterascend.FasterAscend
+authors: [ TimeCoding ]
+description: Adds the ability to climb up ladders/vines and water faster!
+website: timecoding.de
+
+commands:
+  fasterascend:
+    aliases:
+      - fa
+    description: "This command allows to reload the config.yml of the FasterAscend plugin!"

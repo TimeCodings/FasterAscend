@@ -1,0 +1,165 @@
+######################################################################################################
+# ███████╗░█████╗░░██████╗████████╗███████╗██████╗░░█████╗░░██████╗░█████╗░███████╗███╗░░██╗██████╗░ #
+# ██╔════╝██╔══██╗██╔════╝╚══██╔══╝██╔════╝██╔══██╗██╔══██╗██╔════╝██╔══██╗██╔════╝████╗░██║██╔══██╗ #
+# █████╗░░███████║╚█████╗░░░░██║░░░█████╗░░██████╔╝███████║╚█████╗░██║░░╚═╝█████╗░░██╔██╗██║██║░░██║ #
+# ██╔══╝░░██╔══██║░╚═══██╗░░░██║░░░██╔══╝░░██╔══██╗██╔══██║░╚═══██╗██║░░██╗██╔══╝░░██║╚████║██║░░██║ #
+# ██║░░░░░██║░░██║██████╔╝░░░██║░░░███████╗██║░░██║██║░░██║██████╔╝╚█████╔╝███████╗██║░╚███║██████╔╝ #
+# ╚═╝░░░░░╚═╝░░╚═╝╚═════╝░░░░╚═╝░░░╚══════╝╚═╝░░╚═╝╚═╝░░╚═╝╚═════╝░░╚════╝░╚══════╝╚═╝░░╚══╝╚═════╝░ #
+######################################################################################################
+# Made by TimeCode @ 2023  #
+# Plugin-Version: 1.0-BETA #
+#       (04.01.2023)       #
+############################################################################################################
+# If you got an error or found a bug (or if you have wishes), join my discord: https://discord.gg/mf9JNrzh #
+############################################################################################################
+
+#Change this to "false" if you want to disable this plugin
+Enabled: true
+
+#Change the InstantClimbUp options
+#Makes, if you want to climb up, that it boosts you until the end (of the for example ladder) is reached
+#IF YOU ENABLE THIS FUNCTION IT MIGHT HAVE CONSEQUENCES
+InstantClimbUp:
+  #Enables this function ("true")
+  Enabled: false
+  #If you enable this, this function will only work if you ascend up from ground
+  OnlyOnGround: true
+  #ONLY NEEDED IF ONLYONGROUND IS ENABLED (this function is useless if the OnlyOnGround method is disabled)
+  #If this function is enabled the normal boost will get activated if you for example climb up at the half of the ladderline
+  #IMPORTANT: THIS OPTION MUST BE DISABLED ("false") IF YOU DISABLED THE ONLYONGROUND OPTION
+  DontDisableNormalBoost: true
+  #Set this to "false" if you just want to climb up instantly and want to disable the climbing animation
+  WithAnimation: true
+
+#Set the blocks where you can ascend up faster
+Blocks:
+  #Enables faster ascending on vines
+  #Coming SOON: Support for 1.19 Weeping and Twisting Vines
+  Vines: true
+  #Enables faster ascending on water
+  #Information: Most of the listed options above and under this option (except the Boost option) are not recommended to use with the water
+  #It is recommended to disable this
+  Water: false
+  #Enables faster ascending on ladders
+  Ladders: true
+
+#Change the settings for the boost (the speed which boosts the player up if he for example uses a ladder)
+Boost:
+  #Change the boost (DEFAULT: 4 | Information: Don't set the boost to high)
+  Speed: 4
+  #Change the delay options (in ticks) (DEFAULT: 7 ticks) (It's not recommended to change this value)
+  #(Information: There must be a delay to make it possible to check if the player want to climb down | If you don't want this you can disable it with Dalay: 0)
+  #(You should only change this value if the speed is so high, that it's impossible to ascend down a ladder/vine/water)
+  Delay: 7
+  #Set a custom speed and delay for the specific blocks
+  #ONLY WORKING IF THE BLOCK IS ENABLED IN THE OPTION Blocks!
+  Custom:
+    #Set a custom speed and delay for the vines
+    Vines:
+      #Set this to "true" if you want to enable the custom "boost"
+      Enabled: false
+      #Set your custom speed
+      Speed: 4
+      #Set your custom delay
+      Delay: 7
+    #Set a custom speed and delay for the water
+    Water:
+      #Set this to "true" if you want to enable the custom "boost"
+      Enabled: false
+      #Set your custom speed
+      Speed: 4
+      #Set your custom delay
+      Delay: 7
+    #Set a custom speed and delay for the ladders
+    Ladders:
+      #Set this to "true" if you want to enable the custom "boost"
+      Enabled: false
+      #Set your custom speed
+      Speed: 4
+      #Set your custom delay
+      Delay: 7
+
+#Adds the ability to climb up the ladder with one click
+#THIS FUNCTION IS ONLY USABLE ON GROUND!
+#This function isn't working so good! It could happen that you need to rightclick two or more times to get this working...
+#(I'm going to fix this)
+RightClick:
+  #Enables this function ("true")
+  Enabled: false
+  #Enable this to be able to ONLY use the left hand to trigger this action
+  OnlyLeft: false
+  #Enable this to be able to ALSO use the left hand to trigger this action
+  #(This option won't work if you enabled the OnlyLeft option)
+  AlsoLeft: true
+  #Set this to "true" to make this option only usable if you press SHIFT and RIGHTCLICK at one time
+  WithShift: true
+  #Set this to "false" if you just want to climb up instantly and want to disable the climbing animation
+  WithAnimation: true
+
+#Enable this mode to press shift to boost up instantly (for example a ladder) (ascending down won't be possible anymore IF YOU PRESS SHIFT)
+#THIS FUNCTION IS ONLY USABLE ON THE LADDER/VINE/WATER! (It is the opposite of the RightClick option)
+ShiftMode:
+  #Enable this function with "true"
+  Enabled: false
+  #Set this to "true" to make this option only usable if you press SHIFT and RIGHTCLICK at one time
+  WithRightClick: true
+  #Set this to "true" to make this option only usable if you press SHIFT and LEFTCLICK at one time
+  WithLeftClick: true
+  #Set this to "false" if you just want to climb up instantly and want to disable the climbing animation
+  WithAnimation: true
+
+#Change all messages and sounds which will get send
+Events:
+  #This event will get triggered if a player starts the ascend-animation
+  OnAscendStart:
+    #Set this to "true" if you want to enable this functions
+    Enabled: false
+    #Set the message which will be sended to the player
+    Message: "&4&lYou've started climbing up!"
+    #Set the sound which will hear the player if this event get triggered
+    Sound:
+      #You can find all Sound-Names here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+      Name: "AMBIENT_SOUL_SAND_VALLEY_MOOD"
+      #Set the sound-volume
+      Volume: 2
+      #Set the sound-pitch
+      Pitch: 2
+  #This event will get triggered if the ascend-animation of a player ends
+  OnAscendEnd:
+    #Set this to "true" if you want to enable this functions
+    Enabled: false
+    #Set the message which will be sended to the player
+    Message: "&4&lWOW! &e&lYou've now climbed up the ladder!"
+    #Set the sound which will hear the player if this event get triggered
+    Sound:
+      #You can find all Sound-Names here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+      Name: "AMBIENT_SOUL_SAND_VALLEY_MOOD"
+      #Set the sound-volume
+      Volume: 2
+      #Set the sound-pitch
+      Pitch: 2
+  #This event will get triggered if a player get instant teleported to the end of a (for example ladder)
+  OnInstantTeleport:
+    #Set this to "true" if you want to enable this functions
+    Enabled: false
+    #Set the message which will be sended to the player
+    Message: "&4&lYou've got teleported to the end of the ladder!"
+    #Set the sound which will hear the player if this event get triggered
+    Sound:
+      #You can find all Sound-Names here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+      Name: "AMBIENT_SOUL_SAND_VALLEY_MOOD"
+      #Set the sound-volume
+      Volume: 2
+      #Set the sound-pitch
+      Pitch: 2
+
+#Set the permission for the command /fastascend reload
+Command-Permission: fastascend.reload
+
+#"bStats is a free and open source website that helps the developer to collect usage data from his plugin" (Source: bstats.org)
+#If you don't want to send me automatic statistics, disable this with changing it to "false"
+bStats: true
+
+#DON'T CHANGE THIS
+#AFTER CHANGING THIS THE CONFIG WON'T EXIST ANYMORE
+config-version: 1.0
