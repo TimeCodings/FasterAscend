@@ -4,6 +4,8 @@ import dev.timecoding.fasterascend.FasterAscend;
 import dev.timecoding.fasterascend.config.ConfigHandler;
 import dev.timecoding.fasterascend.event.*;
 import dev.timecoding.fasterascend.event.enums.FAAPIArg;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -66,7 +68,7 @@ public class AscendListener implements Listener {
         Block block = loc.getBlock();
         Material posm = block.getType();
         isonground.remove(p);
-        if(configHandler.getBoolean("Blocks.Ladders") && posm == Material.LADDER || configHandler.getBoolean("Blocks.Vines") && posm == Material.VINE || configHandler.getBoolean("Blocks.Water") && posm == Material.WATER){
+        if(materialAllowed(posm) && !isInBlacklist(p)){
             if(getBefore(p) == null){
                 setBefore(p, loc);
             }
@@ -75,7 +77,7 @@ public class AscendListener implements Listener {
                 setBefore(p, loc);
                 Location subtract = loc.subtract(0,1,0);
                 Material m = subtract.getBlock().getType();
-                if(configHandler.getBoolean("Blocks.Ladders") && m == Material.LADDER || configHandler.getBoolean("Blocks.Vines") && m == Material.VINE || configHandler.getBoolean("Blocks.Water") && m == Material.WATER) {
+                if(materialAllowed(m)) {
                     if (loc.getY() > before.getY()) {
                         if(!apitriggered.contains(p)){
                             triggerAPIEvent(FAAPIArg.OnAscendStart, p);
@@ -174,12 +176,12 @@ public class AscendListener implements Listener {
     @EventHandler
     public void onRightClick(PlayerInteractEvent e){
         Player p = e.getPlayer();
-        if(configHandler.getBoolean("RightClick.Enabled") && isonground.contains(p)) {
+        if(configHandler.getBoolean("RightClick.Enabled") && isonground.contains(p) && !isInBlacklist(p)) {
             if (configHandler.getBoolean("RightClick.OnlyLeft") && e.getAction() == Action.LEFT_CLICK_BLOCK || configHandler.getBoolean("RightClick.AlsoLeft") && !configHandler.getBoolean("RightClick.OnlyLeft") && e.getAction() == Action.RIGHT_CLICK_BLOCK || configHandler.getBoolean("RightClick.AlsoLeft") && !configHandler.getBoolean("RightClick.OnlyLeft") && e.getAction() == Action.LEFT_CLICK_BLOCK || !configHandler.getBoolean("RightClick.AlsoLeft") && !configHandler.getBoolean("RightClick.OnlyLeft") && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
                  if(configHandler.getBoolean("RightClick.WithShift") && p.isSneaking() || !configHandler.getBoolean("RightClick.WithShift")){
                      Material posm = e.getClickedBlock().getType();
                      double speed = (0.1 * getCustomSpeed(posm));
-                     if(configHandler.getBoolean("Blocks.Ladders") && posm == Material.LADDER || configHandler.getBoolean("Blocks.Vines") && posm == Material.VINE || configHandler.getBoolean("Blocks.Water") && posm == Material.WATER) {
+                     if(materialAllowed(posm)) {
                          if (configHandler.getBoolean("RightClick.WithAnimation")) {
                              if(!instantanimation.contains(p)){
                                  triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
@@ -205,8 +207,8 @@ public class AscendListener implements Listener {
         Player p = e.getPlayer();
         Material posm = p.getLocation().getBlock().getType();
         double speed = (0.1 * getCustomSpeed(posm));
-        if(configHandler.getBoolean("ShiftMode.Enabled")){
-        if(configHandler.getBoolean("Blocks.Ladders") && posm == Material.LADDER || configHandler.getBoolean("Blocks.Vines") && posm == Material.VINE || configHandler.getBoolean("Blocks.Water") && posm == Material.WATER) {
+        if(configHandler.getBoolean("ShiftMode.Enabled") && !isInBlacklist(p)){
+        if(materialAllowed(posm)) {
             if(!isonground.contains(p) && !wasonground.contains(p)){
                 if (configHandler.getBoolean("ShiftMode.WithAnimation")) {
                     if(!instantanimation.contains(p)){
@@ -227,13 +229,37 @@ public class AscendListener implements Listener {
         }
     }
 
+    public boolean materialAllowed(Material posm){
+        if(configHandler.getBoolean("Blocks.Ladders") && posm == Material.LADDER || configHandler.getBoolean("Blocks.Vines") && posm == Material.VINE || configHandler.getBoolean("Blocks.Water") && posm == Material.WATER){
+            return true;
+        }
+        if(plugin.areScaffholdingsAllowed()){
+            if(configHandler.getBoolean("Blocks.Scaffholdings") && posm == Material.SCAFFOLDING){
+                return true;
+            }
+        }
+        if(plugin.areExtravinesAllowed()){
+            if(configHandler.getBoolean("Blocks.ExtraVines.Weeping")){
+                if(posm == Material.WEEPING_VINES || posm == Material.WEEPING_VINES_PLANT){
+                    return true;
+                }
+            }
+            if(configHandler.getBoolean("Blocks.ExtraVines.Twisting")){
+                if(posm == Material.TWISTING_VINES || posm == Material.TWISTING_VINES_PLANT){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public Integer getHighestPointOnLadder(Location loc){
         Integer finali = 0;
         for(int i = loc.getBlockY(); i <= loc.getWorld().getHighestBlockYAt(loc)+256; i++){
             Block b = loc.getWorld().getBlockAt(loc.getBlockX(), i, loc.getBlockZ());
             Material posm = b.getType();
             if(posm != null) {
-                if (configHandler.getBoolean("Blocks.Ladders") && posm == Material.LADDER || configHandler.getBoolean("Blocks.Vines") && posm == Material.VINE || configHandler.getBoolean("Blocks.Water") && posm == Material.WATER) {
+                if (materialAllowed(posm)) {
                     finali = i;
                 }
             }
@@ -291,6 +317,14 @@ public class AscendListener implements Listener {
             case LADDER:
                 return configHandler.getBoolean("Boost.Custom.Ladders.Enabled");
         }
+        if(plugin.areScaffholdingsAllowed() && m == Material.SCAFFOLDING){
+            return configHandler.getBoolean("Boost.Custom.Scaffholdings.Enabled");
+        }
+        if(plugin.areExtravinesAllowed()){
+            if(m.name().startsWith("WEEPING_VINES") || m.name().startsWith("TWISTING_VINES")){
+                return configHandler.getBoolean("Boost.Custom.ExtraVines.Enabled");
+            }
+        }
         return false;
     }
 
@@ -305,7 +339,36 @@ public class AscendListener implements Listener {
                     return configHandler.getInteger("Boost.Custom.Ladders.Speed");
             }
         }
+        if(plugin.areScaffholdingsAllowed() && m == Material.SCAFFOLDING){
+            return configHandler.getInteger("Boost.Custom.Scaffholdings.Speed");
+        }
+        if(plugin.areExtravinesAllowed()){
+            if(m.name().startsWith("WEEPING_VINES") || m.name().startsWith("TWISTING_VINES")){
+                return configHandler.getInteger("Boost.Custom.ExtraVines.Speed");
+            }
+        }
         return configHandler.getInteger("Boost.Speed");
+    }
+
+    public boolean isInBlacklist(Player p){
+        if(configHandler.getBoolean("Blacklist.Enabled")){
+            String worldname = p.getWorld().getName();
+            List<String> list = configHandler.getConfig().getStringList("Blacklist.Worlds");
+            if(configHandler.getBoolean("Blacklist.ToWhitelist")){
+                if(list.contains(worldname)){
+                    return false;
+                }else{
+                    return true;
+                }
+            }else{
+                if(list.contains(worldname)){
+                    return true;
+                }else{
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 
     public Integer getCustomDelay(Material m){
@@ -317,6 +380,14 @@ public class AscendListener implements Listener {
                     return configHandler.getInteger("Boost.Custom.Water.Delay");
                 case LADDER:
                     return configHandler.getInteger("Boost.Custom.Ladders.Delay");
+            }
+        }
+        if(plugin.areScaffholdingsAllowed() && m == Material.SCAFFOLDING){
+            return configHandler.getInteger("Boost.Custom.Scaffholdings.Delay");
+        }
+        if(plugin.areExtravinesAllowed()){
+            if(m.name().startsWith("WEEPING_VINES") || m.name().startsWith("TWISTING_VINES")){
+                return configHandler.getInteger("Boost.Custom.ExtraVines.Delay");
             }
         }
         return configHandler.getInteger("Boost.Delay");

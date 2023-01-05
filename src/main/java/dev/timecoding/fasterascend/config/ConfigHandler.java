@@ -24,7 +24,7 @@ public class ConfigHandler {
 
     private boolean retry = false;
 
-    private String newconfigversion = "1.0";
+    private String newconfigversion = "1.0.1";
 
     public void init() {
         plugin.saveDefaultConfig();
@@ -75,17 +75,17 @@ public class ConfigHandler {
                 Bukkit.getScheduler().runTaskLaterAsynchronously(this.plugin, new Runnable() {
 
                     public void run() {
-                        plugin.saveResource("config.yml", false);
+                        plugin.saveResource("config.yml", true);
                         reload();
                         for (String save : quicksave.keySet()) {
-                            if (keyExists(save) && !save.equalsIgnoreCase("config-version")) {
+                            if (keyExists(save) && quicksave.get(save) != null && !save.equalsIgnoreCase("config-version")) {
                                 getConfig().set(save, quicksave.get(save));
                             }
                         }
                         save();
                         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Config got updated!");
                     }
-                }, 10);
+                }, 50);
             } else {
                 Bukkit.getConsoleSender().sendMessage(ChatColor.RED + "No Config found! Creating a new one...");
                 this.plugin.saveResource("config.yml", false);

@@ -1,6 +1,7 @@
 name: FasterAscend
-version: 1.0-BETA
+version: 1.0.1-BETA
 main: dev.timecoding.fasterascend.FasterAscend
+api-version: 1.13
 authors: [ TimeCoding ]
 description: Adds the ability to climb up ladders/vines and water faster!
 website: timecoding.de
