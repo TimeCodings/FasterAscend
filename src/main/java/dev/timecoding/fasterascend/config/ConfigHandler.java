@@ -24,7 +24,7 @@ public class ConfigHandler {
 
     private boolean retry = false;
 
-    private String newconfigversion = "1.0.1";
+    private String newconfigversion = "1.1";
 
     public void init() {
         plugin.saveDefaultConfig();

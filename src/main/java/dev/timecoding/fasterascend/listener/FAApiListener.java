@@ -42,6 +42,11 @@ public class FAApiListener implements Listener {
     }
 
     @EventHandler
+    public void onAscendBoost(OnAscendBoost e){
+        triggerConfigEvents(e.getPlayer(), "OnAscendBoost");
+    }
+
+    @EventHandler
     public void onInstantTeleport(OnInstantTeleport e){
         triggerConfigEvents(e.getPlayer(), "OnInstantTeleport");
     }
@@ -50,7 +55,9 @@ public class FAApiListener implements Listener {
         String arg = "Events."+argname+".";
         if(configHandler.getBoolean(arg+"Enabled")){
             p.sendMessage(String.valueOf(getObjectWithPlaceholders(configHandler.getString(arg+"Message"), p)));
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(String.valueOf(getObjectWithPlaceholders(configHandler.getString(arg+"Message"), p))));
+            if(!plugin.isActionbarDisabled()) {
+                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(String.valueOf(getObjectWithPlaceholders(configHandler.getString(arg + "Message"), p))));
+            }
             p.playSound(p.getLocation(), Sound.valueOf(configHandler.getString(arg+"Sound.Name")), configHandler.getInteger(arg+"Sound.Volume"), configHandler.getInteger(arg+"Sound.Pitch"));
         }
     }

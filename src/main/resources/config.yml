@@ -7,10 +7,13 @@
 # ╚═╝░░░░░╚═╝░░╚═╝╚═════╝░░░░╚═╝░░░╚══════╝╚═╝░░╚═╝╚═╝░░╚═╝╚═════╝░░╚════╝░╚══════╝╚═╝░░╚══╝╚═════╝░ #
 ######################################################################################################
 # Made by TimeCode @ 2023  #
-# Plugin-Version: 1.0-BETA #
-#       (04.01.2023)       #
+# Plugin-Version: 1.1-BETA #
+#       (11.01.2023)       #
 ############################################################################################################
 # If you got an error or found a bug (or if you have wishes), join my discord: https://discord.gg/mf9JNrzh #
+############################################################################################################
+# This plugin was made for the Minecraft-Versions 1.14-1.19! I've tested versions below and fixed bugs for #
+# their versions (1.8-1.13) but using it is not recommended!                                               #
 ############################################################################################################
 
 #Change this to "false" if you want to disable this plugin
@@ -49,6 +52,13 @@ Blocks:
     Twisting: true
     #Enables faster ascending on weeping vines
     Weeping: true
+
+#This option allows you to just enable "Faster Ascending" if the ladder/vine/water... has a specific length
+RequiredLength:
+  #Change this to "true" if you want to enable it
+  Enabled: false
+  #Change the MINIMUM length of the ladder/vine/water... IN BLOCKS
+  LengthInBlocks: 10
 
 #Set worlds where players won't be able to use this feature
 Blacklist:
@@ -141,6 +151,7 @@ ShiftMode:
 
 #Change all messages and sounds which will get send
 #ALL EVENTS YOU CAN FIND IN THE API (see it on my spigot site) OR IF YOU WANT A EVENT ADDED TO THE CONFIG JOIN MY DISCORD
+#IMPORTANT: You need to change the sound-names (if you're using sounds of the minecraft-versions 1.8-1.13) to the older sound-names (you can see them in the old spigot/paper developer docs)
 Events:
   #This event will get triggered if a player starts the ascend-animation
   #ALL PLACEHOLDERS (NEW and ONLY working for the SubOptions Message and Actionbar.Message):
@@ -152,6 +163,22 @@ Events:
     Message: "&4&lYou've started climbing up the %block_name_lowercase%!"
     #Change the message of the new actiobar
     Actionbar: "&c&lLets climb up &e&l%player%"
+    #Set the sound which will hear the player if this event get triggered
+    Sound:
+      #You can find all Sound-Names here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
+      Name: "AMBIENT_SOUL_SAND_VALLEY_MOOD"
+      #Set the sound-volume
+      Volume: 2
+      #Set the sound-pitch
+      Pitch: 2
+  #This event will get triggered if you get boosted! (IMPORTANT EXAMPLE: If you're for example on a ladder with 10 in a row you will get boosted like 2-4 times)
+  OnAscendBoost:
+    #Set this to "true" if you want to enable this functions
+    Enabled: false
+    #Set the message which will be sended to the player
+    Message: "&e&lYou got boosted!"
+    #Change the message of the new actiobar
+    Actionbar: "&c&lB&e&lO&a&lO&f&lS&7&lT&f&l!"
     #Set the sound which will hear the player if this event get triggered
     Sound:
       #You can find all Sound-Names here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Sound.html
@@ -193,6 +220,12 @@ Events:
       #Set the sound-pitch
       Pitch: 2
 
+#This option fixes (it the option is enabled ("true")) the following bug:
+#If you want to ascend DOWN a scaffholding with SHIFT you will get boosted back to the highest block of the scaffholding
+#(This bug was found in the Minecraft-Version 1.14)
+#I DO RECOMMEND TO DISABLE THIS BUGFIX (Because it could have consequences for the "ShiftMode" option)
+FixScaffholdings: true
+
 #Set the permission for the command /fastascend reload
 Command-Permission: fastascend.reload
 
@@ -202,4 +235,4 @@ bStats: true
 
 #DON'T CHANGE THIS
 #AFTER CHANGING THIS THE CONFIG WON'T EXIST ANYMORE
-config-version: 1.0.1
+config-version: 1.1
