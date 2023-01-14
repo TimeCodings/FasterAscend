@@ -25,11 +25,8 @@ Long story short, below you'll find a tutorial on how to install it, as well as 
 5. You're ready! All options are described in the config.yml (which you can find in the FasterAscend folder in the plugins folder of your Minecraft-Server) and if you need help, join my discord (or watch my German Tutorial after it got released)
 
 **Coming Soon / TODO:**
-- Support for Weeping and Twisting Vines
-- Full Support for the Minecraft-Versions between 1.8.8 - 1.19.3
-- World Blacklist/Whitelist
-- Placeholders & Actionbar Support
-- Update Notifications (in the next update)
+- Cleaner Code
+- Add option for faster "Climbing Down/Ascending Down"
 - Your Wishes (Write me your Ideas: https://discord.gg/mf9JNrzh)
 
 **Commands:**
@@ -60,4 +57,4 @@ For all developers which are using my plugin: The API is simple to use! You just
     OnInstantTeleport | Gets triggered if you get instantly teleported to the end of a ladder/vine/(water)
 
 **Spigot-Site:** https://www.spigotmc.org/resources/faster-ascend.107195/
-**Songoda-Marketplace-Site:** Coming-Soon
+**Songoda-Marketplace-Site:** https://marketplace.songoda.com/marketplace/product/faster-ascend-ascend-faster-ladders-vines-water.886
