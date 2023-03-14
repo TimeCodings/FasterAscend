@@ -7,7 +7,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class FasterAscendCommand implements CommandExecutor{
 
@@ -19,7 +18,7 @@ public class FasterAscendCommand implements CommandExecutor{
         this.configHandler = this.plugin.getConfigHandler();
     }
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
             if(sender.hasPermission(configHandler.getString("Command-Permission"))){
                 if(args.length == 1) {
                     if (args[0].equalsIgnoreCase("rl") || args[0].equalsIgnoreCase("reload")) {

@@ -5,8 +5,6 @@ import dev.timecoding.fasterascend.config.ConfigHandler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +19,7 @@ public class FasterAscendCompleter implements TabCompleter {
         this.configHandler = this.plugin.getConfigHandler();
     }
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if(command.getName().equalsIgnoreCase("fasterascend") || command.getName().equalsIgnoreCase("fa")){
             if(args.length == 1 && sender.hasPermission(configHandler.getString("Command-Permission"))){
                 List<String> list = new ArrayList<>();

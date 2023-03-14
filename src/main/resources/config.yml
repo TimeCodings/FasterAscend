@@ -7,8 +7,8 @@
 # ╚═╝░░░░░╚═╝░░╚═╝╚═════╝░░░░╚═╝░░░╚══════╝╚═╝░░╚═╝╚═╝░░╚═╝╚═════╝░░╚════╝░╚══════╝╚═╝░░╚══╝╚═════╝░ #
 ######################################################################################################
 # Made by TimeCode @ 2023  #
-# Plugin-Version: 1.1-BETA #
-#       (11.01.2023)       #
+# Plugin-Version: 1.2-BETA #
+#       (14.03.2023)       #
 ############################################################################################################
 # If you got an error or found a bug (or if you have wishes), join my discord: https://discord.gg/mf9JNrzh #
 ############################################################################################################
@@ -79,7 +79,7 @@ Boost:
   #Change the delay options (in ticks) (DEFAULT: 7 ticks) (It's not recommended to change this value)
   #(Information: There must be a delay to make it possible to check if the player want to climb down | If you don't want this you can disable it with Dalay: 0)
   #(You should only change this value if the speed is so high, that it's impossible to ascend down a ladder/vine/water)
-  Delay: 7
+  Delay: 10
   #Set a custom speed and delay for the specific blocks
   #ONLY WORKING IF THE BLOCK IS ENABLED IN THE OPTION Blocks!
   Custom:

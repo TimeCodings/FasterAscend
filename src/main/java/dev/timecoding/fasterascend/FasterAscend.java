@@ -1,6 +1,7 @@
 package dev.timecoding.fasterascend;
 
-import dev.timecoding.fasterascend.api.Metrics;
+import dev.timecoding.fasterascend.api.mfnalex.McVersion;
+import dev.timecoding.fasterascend.api.bstats.Metrics;
 import dev.timecoding.fasterascend.api.UpdateChecker;
 import dev.timecoding.fasterascend.command.FasterAscendCommand;
 import dev.timecoding.fasterascend.command.completer.FasterAscendCompleter;
@@ -44,9 +45,7 @@ public final class FasterAscend extends JavaPlugin {
         if(this.configHandler.getBoolean("Enabled")) {
             this.updateChecker = new UpdateChecker(this, spigotid);
             sender.sendMessage("§eFasterAscend §cv" + this.getDescription().getVersion() + " §agot enabled!");
-
-            if(methodExists("getMinecraftVersion")) {
-                String version = Bukkit.getMinecraftVersion();
+                String version = McVersion.current().getName();
                 ArrayList<String> split = new ArrayList<String>(Arrays.asList(version.split("\\.")));
                 if (split.get(1) == null) {
                     sender.sendMessage("§cUnable to get Minecraft-Version! Disabling Plugin...");
@@ -61,17 +60,14 @@ public final class FasterAscend extends JavaPlugin {
                     extravines = true;
                     sender.sendMessage("§7Enabled Support for §cWeeping and Twisting Vines §7(>= Minecraft Version 1.16)");
                 }
-                scaffhold = true;
-                sender.sendMessage("§7Enabled Support for §cScaffholding §7(>= Minecraft Version 1.14)");
-            }else if(methodExists("getVersion")){
-                String legacyversion = Bukkit.getVersion();
-                if(legacyversion.contains("1.14")){
+                if(baseversion >= 14){
                     scaffhold = true;
                     sender.sendMessage("§7Enabled Support for §cScaffholding §7(>= Minecraft Version 1.14)");
-                }else {
+                }
+                if(baseversion < 14){
                     boolean valid = false;
                     for(String versions : this.legacyversions){
-                        if(legacyversion.contains(versions)){
+                        if(version.contains(versions)){
                             valid = true;
                             if(isNotForActionBar(versions)){
                                 actionbardisabled = true;
@@ -84,10 +80,6 @@ public final class FasterAscend extends JavaPlugin {
                         disable = true;
                     }
                 }
-            }else{
-                sender.sendMessage("§cWOW! This minecraft-version is'nt compatible right now! Are you a Minecraft OG? xD");
-                disable = true;
-            }
 
             if(!disable) {
                 //Enable bStats
