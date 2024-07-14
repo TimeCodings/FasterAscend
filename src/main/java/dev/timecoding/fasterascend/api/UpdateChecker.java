@@ -22,7 +22,7 @@ public class UpdateChecker {
     this.newVersion = plugin.getDescription().getVersion();
     this.project = id;
     try {
-      this.checkURL = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + id);
+      this.checkURL = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + id+"&time="+System.currentTimeMillis());
     } catch (MalformedURLException malformedURLException) {}
   }
   

@@ -474,10 +474,12 @@ public class AscendListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
         Player sender = event.getPlayer();
-        if(sender.hasPermission(plugin.getConfigHandler().getString("Command-Permission"))) {
-            sender.sendMessage("§aA newer version of the plugin §eFasterAscend §ais already available! §e(Version §c" + plugin.getUpdateChecker().getLatestVersion() + "§e)");
-            sender.sendMessage("§aFor the best experience download it here: §ehttps://www.spigotmc.org/resources/faster-ascend.107195/");
-        }
+        try {
+            if(sender.hasPermission(plugin.getConfigHandler().getString("Command-Permission")) && this.plugin.getUpdateChecker().checkForUpdates()) {
+                sender.sendMessage("§aA newer version of the plugin §eFasterAscend §ais already available! §e(Version §c" + plugin.getUpdateChecker().getLatestVersion() + "§e)");
+                sender.sendMessage("§aFor the best experience download it here: §ehttps://www.spigotmc.org/resources/faster-ascend.107195/");
+            }
+        } catch (Exception e) {}
     }
 
 }
