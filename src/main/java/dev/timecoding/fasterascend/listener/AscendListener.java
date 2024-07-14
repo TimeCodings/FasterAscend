@@ -4,8 +4,6 @@ import dev.timecoding.fasterascend.FasterAscend;
 import dev.timecoding.fasterascend.config.ConfigHandler;
 import dev.timecoding.fasterascend.event.*;
 import dev.timecoding.fasterascend.event.enums.FAAPIArg;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -15,9 +13,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,9 +61,9 @@ public class AscendListener implements Listener {
         return null;
     }
 
-    public boolean fixScaffholdings(Player p, Material m){
-        Boolean scaffAllowed = plugin.areScaffholdingsAllowed();
-        Boolean scaffBugFix = configHandler.getBoolean("FixScaffholdings");
+    public boolean fixScaffolding(Player p, Material m){
+        Boolean scaffAllowed = plugin.areScaffoldingAllowed();
+        Boolean scaffBugFix = configHandler.getBoolean("FixScaffolding");
         if(scaffAllowed && scaffBugFix && m.equals(Material.SCAFFOLDING) && p.isSneaking()){
             return true;
         }
@@ -79,7 +77,7 @@ public class AscendListener implements Listener {
         Block block = loc.getBlock();
         Material posm = block.getType();
         isonground.remove(p);
-        if(!fixScaffholdings(p, posm)) {
+        if(!fixScaffolding(p, posm)) {
             if (materialAllowed(posm) && !isInBlacklist(p)) {
                 if (getBefore(p) == null) {
                     setBefore(p, loc);
@@ -89,17 +87,18 @@ public class AscendListener implements Listener {
                     setBefore(p, loc);
                     Location subtract = loc.subtract(0, 1, 0);
                     Material m = subtract.getBlock().getType();
+                    boolean blockIt = false;
                     if (materialAllowed(m)) {
                         if (loc.getY() > before.getY() && highIsValid(p)) {
                             if (!apitriggered.contains(p)) {
-                                triggerAPIEvent(FAAPIArg.OnAscendStart, p);
+                                blockIt = triggerAPIEvent(FAAPIArg.OnAscendStart, p);
                                 apitriggered.add(p);
                             }
                             if (p.getLocation().getY() >= getHighestPointOnLadder(p.getLocation()) - 1) {
                                 if (instantanimation.contains(p)) {
-                                    triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationEnd, p);
+                                    blockIt = triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationEnd, p);
                                 } else {
-                                    triggerAPIEvent(FAAPIArg.OnAscendEnd, p);
+                                    blockIt = triggerAPIEvent(FAAPIArg.OnAscendEnd, p);
                                 }
                                 instantanimation.remove(p);
                                 apitriggered.remove(p);
@@ -107,9 +106,11 @@ public class AscendListener implements Listener {
                             }
                             double speed = (0.1 * getCustomSpeed(posm));
                             if (configHandler.getBoolean("RightClick.Enabled") && wasonground.contains(p) || configHandler.getBoolean("ShiftMode.Enabled") && wasonground.contains(p)) {
-                                p.setVelocity(p.getVelocity().setY(speed));
-                                if (p.getLocation().getY() >= getHighestPointOnLadder(p.getLocation()) - 1) {
-                                    wasonground.remove(p);
+                                if(!blockIt) {
+                                    p.setVelocity(p.getVelocity().setY(speed));
+                                    if (p.getLocation().getY() >= getHighestPointOnLadder(p.getLocation()) - 1) {
+                                        wasonground.remove(p);
+                                    }
                                 }
                             }
                             if (!configHandler.getBoolean("InstantClimbUp.Enabled") || configHandler.getBoolean("InstantClimbUp.Enabled") && configHandler.getBoolean("InstantClimbUp.DontDisableNormalBoost") && !wasonground.contains(p)) {
@@ -123,30 +124,38 @@ public class AscendListener implements Listener {
                                         }
                                     }, getCustomDelay(posm));
                                 } else {
-                                    triggerAPIEvent(FAAPIArg.OnAscendBoost, p);
-                                    p.setVelocity(p.getVelocity().setY(speed));
-                                    needinput.add(p);
+                                    blockIt = triggerAPIEvent(FAAPIArg.OnAscendBoost, p);
+                                    if(!blockIt) {
+                                        p.setVelocity(p.getVelocity().setY(speed));
+                                        needinput.add(p);
+                                    }
                                 }
                             } else {
                                 if (!configHandler.getBoolean("InstantClimbUp.OnlyOnGround")) {
                                     if (configHandler.getBoolean("InstantClimbUp.WithAnimation")) {
                                         if (!instantanimation.contains(p)) {
-                                            triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
+                                            blockIt = triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
                                             instantanimation.add(p);
                                         }
-                                        p.setVelocity(p.getVelocity().setY(speed));
+                                        if(!blockIt) {
+                                            p.setVelocity(p.getVelocity().setY(speed));
+                                        }
                                     } else {
-                                        Location location = new Location(p.getWorld(), p.getLocation().getX(), getHighestPointOnLadder(p.getLocation()), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch());
-                                        p.teleport(location);
-                                        triggerAPIEvent(FAAPIArg.OnInstantTeleport, p);
+                                        blockIt = triggerAPIEvent(FAAPIArg.OnInstantTeleport, p);
+                                        if(!blockIt) {
+                                            Location location = new Location(p.getWorld(), p.getLocation().getX(), getHighestPointOnLadder(p.getLocation()), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch());
+                                            p.teleport(location);
+                                        }
                                     }
                                 } else {
                                     if (configHandler.getBoolean("InstantClimbUp.WithAnimation") && wasonground.contains(p)) {
                                         if (!instantanimation.contains(p)) {
-                                            triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
+                                            blockIt = triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
                                             instantanimation.add(p);
                                         }
-                                        p.setVelocity(p.getVelocity().setY(speed));
+                                        if(!blockIt) {
+                                            p.setVelocity(p.getVelocity().setY(speed));
+                                        }
                                         if (p.getLocation().getY() >= getHighestPointOnLadder(p.getLocation()) - 1) {
                                             wasonground.remove(p);
                                         }
@@ -163,19 +172,23 @@ public class AscendListener implements Listener {
                                 if (configHandler.getBoolean("InstantClimbUp.WithAnimation")) {
                                     if (!instantanimation.contains(p)) {
                                         if (!instantanimation.contains(p)) {
-                                            triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
+                                            blockIt = triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
                                             instantanimation.add(p);
                                         }
                                         instantanimation.add(p);
                                     }
-                                    p.setVelocity(p.getVelocity().setY(speed));
+                                    if(!blockIt) {
+                                        p.setVelocity(p.getVelocity().setY(speed));
+                                    }
                                     if (!wasonground.contains(p)) {
                                         wasonground.add(p);
                                     }
                                 } else {
-                                    Location location = new Location(p.getWorld(), p.getLocation().getX(), getHighestPointOnLadder(p.getLocation()), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch());
-                                    p.teleport(location);
-                                    triggerAPIEvent(FAAPIArg.OnInstantTeleport, p);
+                                    blockIt = triggerAPIEvent(FAAPIArg.OnInstantTeleport, p);
+                                    if(!blockIt) {
+                                        Location location = new Location(p.getWorld(), p.getLocation().getX(), getHighestPointOnLadder(p.getLocation()), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch());
+                                        p.teleport(location);
+                                    }
                                 }
                             }
                         }
@@ -219,24 +232,37 @@ public class AscendListener implements Listener {
     @EventHandler
     public void onToggleSneak(PlayerToggleSneakEvent e){
         Player p = e.getPlayer();
+        if(plugin.getConfigHandler().getBoolean("SneakingStop") && e.isSneaking() && plugin.getFaApiListener().getInAnimation().contains(p)){
+            plugin.getFaApiListener().getInAnimation().remove(p);
+            needinput.remove(p);
+            instantanimation.remove(p);
+            apitriggered.remove(p);
+            isonground.remove(p);
+            wasonground.remove(p);
+        }
         Material posm = p.getLocation().getBlock().getType();
         double speed = (0.1 * getCustomSpeed(posm));
+        boolean blockIt = false;
         if(configHandler.getBoolean("ShiftMode.Enabled") && !isInBlacklist(p)){
         if(materialAllowed(posm)) {
             if(!isonground.contains(p) && !wasonground.contains(p)){
                 if (configHandler.getBoolean("ShiftMode.WithAnimation")) {
                     if(!instantanimation.contains(p)){
-                        triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
+                        blockIt = triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
                         instantanimation.add(p);
                     }
-                    p.setVelocity(p.getVelocity().setY(speed));
+                    if(!blockIt) {
+                        p.setVelocity(p.getVelocity().setY(speed));
+                    }
                     if (!wasonground.contains(p)) {
                         wasonground.add(p);
                     }
                 } else {
-                    Location location = new Location(p.getWorld(), p.getLocation().getX(), getHighestPointOnLadder(p.getLocation()), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch());
-                    p.teleport(location);
-                    triggerAPIEvent(FAAPIArg.OnInstantTeleport, p);
+                    blockIt = triggerAPIEvent(FAAPIArg.OnInstantTeleport, p);
+                    if(!blockIt) {
+                        Location location = new Location(p.getWorld(), p.getLocation().getX(), getHighestPointOnLadder(p.getLocation()), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch());
+                        p.teleport(location);
+                    }
                 }
             }
         }
@@ -247,8 +273,8 @@ public class AscendListener implements Listener {
         if(configHandler.getBoolean("Blocks.Ladders") && posm == Material.LADDER || configHandler.getBoolean("Blocks.Vines") && posm == Material.VINE || configHandler.getBoolean("Blocks.Water") && posm == Material.WATER){
             return true;
         }
-        if(plugin.areScaffholdingsAllowed()){
-            if(configHandler.getBoolean("Blocks.Scaffholdings") && posm == Material.SCAFFOLDING){
+        if(plugin.areScaffoldingAllowed()){
+            if(configHandler.getBoolean("Blocks.Scaffolding") && posm == Material.SCAFFOLDING){
                 return true;
             }
         }
@@ -330,45 +356,34 @@ public class AscendListener implements Listener {
         return true;
     }
 
-    public void triggerAPIEvent(FAAPIArg faapiArg, Player p){
+    public boolean triggerAPIEvent(FAAPIArg faapiArg, Player p){
         switch (faapiArg){
             case OnAscendEnd:
                 OnAscendEnd onAscendEnd = new OnAscendEnd(p);
-                if(!onAscendEnd.isCancelled()){
-                    Bukkit.getPluginManager().callEvent(onAscendEnd);
-                }
-                break;
+                Bukkit.getPluginManager().callEvent(onAscendEnd);
+                return onAscendEnd.isCancelled();
             case OnAscendStart:
                 OnAscendStart onAscendStart = new OnAscendStart(p);
-                if(!onAscendStart.isCancelled()){
-                    Bukkit.getPluginManager().callEvent(onAscendStart);
-                }
-                break;
+                Bukkit.getPluginManager().callEvent(onAscendStart);
+                return onAscendStart.isCancelled();
             case OnAscendBoost:
                 OnAscendBoost onAscendBoost = new OnAscendBoost(p);
-                if(!onAscendBoost.isCancelled()){
-                    Bukkit.getPluginManager().callEvent(onAscendBoost);
-                }
-                break;
+                Bukkit.getPluginManager().callEvent(onAscendBoost);
+                return onAscendBoost.isCancelled();
             case OnInstantTeleport:
                 OnInstantTeleport onInstantTeleport = new OnInstantTeleport(p);
-                if(!onInstantTeleport.isCancelled()){
-                    Bukkit.getPluginManager().callEvent(onInstantTeleport);
-                }
-                break;
+                Bukkit.getPluginManager().callEvent(onInstantTeleport);
+                return onInstantTeleport.isCancelled();
             case OnInstantAscendAnimationStart:
                 OnInstantAscendAnimationStart onInstantAscendAnimationStart = new OnInstantAscendAnimationStart(p);
-                if(!onInstantAscendAnimationStart.isCancelled()){
-                    Bukkit.getPluginManager().callEvent(onInstantAscendAnimationStart);
-                }
-                break;
+                Bukkit.getPluginManager().callEvent(onInstantAscendAnimationStart);
+                return onInstantAscendAnimationStart.isCancelled();
             case OnInstantAscendAnimationEnd:
                 OnInstantAscendAnimationEnd onInstantAscendAnimationEnd = new OnInstantAscendAnimationEnd(p);
-                if(!onInstantAscendAnimationEnd.isCancelled()){
-                    Bukkit.getPluginManager().callEvent(onInstantAscendAnimationEnd);
-                }
-                break;
+                Bukkit.getPluginManager().callEvent(onInstantAscendAnimationEnd);
+                return onInstantAscendAnimationEnd.isCancelled();
         }
+        return false;
     }
 
     public boolean customEnabled(Material m){
@@ -380,8 +395,8 @@ public class AscendListener implements Listener {
             case LADDER:
                 return configHandler.getBoolean("Boost.Custom.Ladders.Enabled");
         }
-        if(plugin.areScaffholdingsAllowed() && m == Material.SCAFFOLDING){
-            return configHandler.getBoolean("Boost.Custom.Scaffholdings.Enabled");
+        if(plugin.areScaffoldingAllowed() && m == Material.SCAFFOLDING){
+            return configHandler.getBoolean("Boost.Custom.Scaffolding.Enabled");
         }
         if(plugin.areExtravinesAllowed()){
             if(m.name().startsWith("WEEPING_VINES") || m.name().startsWith("TWISTING_VINES")){
@@ -402,8 +417,8 @@ public class AscendListener implements Listener {
                     return configHandler.getInteger("Boost.Custom.Ladders.Speed");
             }
         }
-        if(plugin.areScaffholdingsAllowed() && m == Material.SCAFFOLDING){
-            return configHandler.getInteger("Boost.Custom.Scaffholdings.Speed");
+        if(plugin.areScaffoldingAllowed() && m == Material.SCAFFOLDING){
+            return configHandler.getInteger("Boost.Custom.Scaffolding.Speed");
         }
         if(plugin.areExtravinesAllowed()){
             if(m.name().startsWith("WEEPING_VINES") || m.name().startsWith("TWISTING_VINES")){
@@ -445,8 +460,8 @@ public class AscendListener implements Listener {
                     return configHandler.getInteger("Boost.Custom.Ladders.Delay");
             }
         }
-        if(plugin.areScaffholdingsAllowed() && m == Material.SCAFFOLDING){
-            return configHandler.getInteger("Boost.Custom.Scaffholdings.Delay");
+        if(plugin.areScaffoldingAllowed() && m == Material.SCAFFOLDING){
+            return configHandler.getInteger("Boost.Custom.Scaffolding.Delay");
         }
         if(plugin.areExtravinesAllowed()){
             if(m.name().startsWith("WEEPING_VINES") || m.name().startsWith("TWISTING_VINES")){
@@ -454,6 +469,15 @@ public class AscendListener implements Listener {
             }
         }
         return configHandler.getInteger("Boost.Delay");
+    }
+
+    @EventHandler
+    public void onPlayerJoin(PlayerJoinEvent event){
+        Player sender = event.getPlayer();
+        if(sender.hasPermission(plugin.getConfigHandler().getString("Command-Permission"))) {
+            sender.sendMessage("§aA newer version of the plugin §eFasterAscend §ais already available! §e(Version §c" + plugin.getUpdateChecker().getLatestVersion() + "§e)");
+            sender.sendMessage("§aFor the best experience download it here: §ehttps://www.spigotmc.org/resources/faster-ascend.107195/");
+        }
     }
 
 }

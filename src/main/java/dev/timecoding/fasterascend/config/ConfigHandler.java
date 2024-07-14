@@ -24,7 +24,7 @@ public class ConfigHandler {
 
     private boolean retry = false;
 
-    private String newconfigversion = "1.1";
+    private String newconfigversion = "1.3";
 
     public void init() {
         plugin.saveDefaultConfig();
@@ -57,6 +57,7 @@ public class ConfigHandler {
     }
 
     public void reload() {
+        f = new File(plugin.getDataFolder(), "config.yml");
         cfg = YamlConfiguration.loadConfiguration(f);
     }
 
@@ -77,11 +78,6 @@ public class ConfigHandler {
                     public void run() {
                         plugin.saveResource("config.yml", true);
                         reload();
-                        for (String save : quicksave.keySet()) {
-                            if (keyExists(save) && quicksave.get(save) != null && !save.equalsIgnoreCase("config-version")) {
-                                getConfig().set(save, quicksave.get(save));
-                            }
-                        }
                         save();
                         Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "Config got updated!");
                     }

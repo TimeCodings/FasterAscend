@@ -31,6 +31,8 @@ public final class FasterAscend extends JavaPlugin {
     private boolean actionbardisabled = false;
     private List<String> legacyversions = new ArrayList<>();
 
+    private FAApiListener faApiListener;
+
     @Override
     public void onEnable() {
         this.legacyversions.add("1.13");
@@ -54,7 +56,7 @@ public final class FasterAscend extends JavaPlugin {
                 Integer baseversion = Integer.valueOf(split.get(1));
                 if(baseversion < 19){
                     sender.sendMessage("§cInformation: To use this plugin I recommend to use the newest Minecraft-Version!");
-                    sender.sendMessage("§cTo get support OR REPORT BUGS for the legacy Minecraft-Versions join my discord: https://discord.gg/mf9JNrzh");
+                    sender.sendMessage("§cTo get support OR REPORT BUGS for the legacy Minecraft-Versions join my discord: https://discord.gg/V2wdDPktqc");
                 }
                 if (baseversion >= 16) {
                     extravines = true;
@@ -62,7 +64,7 @@ public final class FasterAscend extends JavaPlugin {
                 }
                 if(baseversion >= 14){
                     scaffhold = true;
-                    sender.sendMessage("§7Enabled Support for §cScaffholding §7(>= Minecraft Version 1.14)");
+                    sender.sendMessage("§7Enabled Support for §cScaffolding §7(>= Minecraft Version 1.14)");
                 }
                 if(baseversion < 14){
                     boolean valid = false;
@@ -76,7 +78,7 @@ public final class FasterAscend extends JavaPlugin {
                         }
                     }
                     if(!valid){
-                        sender.sendMessage("§cHey, this plugin is sadly only compatible with the Minecraft versions between §f1.8 and 1.19§c! If you a version running on versions below, join my discord: https://discord.gg/mf9JNrzh");
+                        sender.sendMessage("§cHey, this plugin is sadly only compatible with the Minecraft versions between §f1.8 and 1.19§c! If you a version running on versions below, join my discord: https://discord.gg/V2wdDPktqc");
                         disable = true;
                     }
                 }
@@ -100,8 +102,9 @@ public final class FasterAscend extends JavaPlugin {
                 }
 
                 PluginManager pluginManager = this.getServer().getPluginManager();
+                this.faApiListener = new FAApiListener(this);
                 pluginManager.registerEvents(new AscendListener(this), this);
-                pluginManager.registerEvents(new FAApiListener(this), this);
+                pluginManager.registerEvents(this.faApiListener, this);
 
                 PluginCommand command = this.getCommand("fasterascend");
                 command.setExecutor(new FasterAscendCommand(this));
@@ -135,10 +138,6 @@ public final class FasterAscend extends JavaPlugin {
         }
     }
 
-    public void checkForUpdate(){
-
-    }
-
     public ConfigHandler getConfigHandler() {
         return configHandler;
     }
@@ -147,11 +146,19 @@ public final class FasterAscend extends JavaPlugin {
         return metrics;
     }
 
-    public boolean areScaffholdingsAllowed() {
+    public boolean areScaffoldingAllowed() {
         return scaffhold;
     }
 
     public boolean areExtravinesAllowed() {
         return extravines;
+    }
+
+    public FAApiListener getFaApiListener() {
+        return faApiListener;
+    }
+
+    public UpdateChecker getUpdateChecker() {
+        return updateChecker;
     }
 }
