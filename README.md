@@ -2,11 +2,11 @@
 ![Faster-Ascend Banner](https://user-images.githubusercontent.com/94994775/210624156-b071867d-0c67-4fd9-9f0f-edc260019c9f.png)
 ![CodeFactor](https://www.codefactor.io/repository/github/timecodings/fasterascend/badge)
 
-**Hey, thanks for viewing this page! Because I found no plugin which allows to ascend faster (climb up ladders faster), I decided to create this Open-Source one! It's still a BETA what means, that there are still bugs and errors which need to be fixed. Because of this I need your help! If you found any bugs or errors or if you have wishes, please join my discord and open a ticket: https://discord.gg/mf9JNrzh | Thanks :)**
+Hey, thanks for viewing this page! Because I found no plugin which allows to ascend faster (climb up ladders faster), I decided to create this Open-Source one! If you found any bugs or errors or if you have wishes, please join my discord and open a ticket: https://discord.gg/XJeAUmbmw9
 
-**Whats Faster Ascend?:**
+**What's Faster Ascend?:**
 With Faster Ascend you're able to speed up the climbing animation on ladders/vines and water. So perfect for any kind of server! In contrast to the version created in 2019 by another Spigot developer, there are many more options here! You may have noticed that the climbing animation cannot be accelerated with a speed effect. So I tricked this a bit using Velocity. In general, there are 2 types to choose from in my version. The liquid and the super fast way. The fluid way plays the climbing animation faster (Informations: it "boosts" the player up) and the super fast way easily teleports the player right to the end of the ladder/water/vines. You can change almost everything, give it a try.
-Long story short, below you'll find a tutorial on how to install it, as well as the features and developer API! Have fun and if you like this plugin I would happy if you leave a positive rating at this plugin on my Spigot or Songoda Site ;)
+Long story short, below you'll find a tutorial on how to install it, as well as the features and developer API! Have fun and if you like this plugin I would happy if you leave a positive rating at this plugin on my Spigot Site ;)
 
 **Features:**
 - Climb ladders/vines/(water) up, when you touch one
@@ -25,9 +25,7 @@ Long story short, below you'll find a tutorial on how to install it, as well as 
 5. You're ready! All options are described in the config.yml (which you can find in the FasterAscend folder in the plugins folder of your Minecraft-Server) and if you need help, join my discord (or watch my German Tutorial after it got released)
 
 **Coming Soon / TODO:**
-- Cleaner Code
-- Add option for faster "Climbing Down/Ascending Down"
-- Your Wishes (Write me your Ideas: https://discord.gg/mf9JNrzh)
+- Your Wishes (Write me your Ideas: https://discord.gg/XJeAUmbmw9 or open a new issue on Github)
 
 **Commands:**
 /fasterascend reload - Reloads the config.yml - Needs the permission fasterascend.reload (you can change this permission in the config.yml)
@@ -57,4 +55,3 @@ For all developers which are using my plugin: The API is simple to use! You just
     OnInstantTeleport | Gets triggered if you get instantly teleported to the end of a ladder/vine/(water)
 
 **Spigot-Site:** https://www.spigotmc.org/resources/faster-ascend.107195/
-**Songoda-Marketplace-Site:** https://marketplace.songoda.com/marketplace/product/faster-ascend-ascend-faster-ladders-vines-water.886

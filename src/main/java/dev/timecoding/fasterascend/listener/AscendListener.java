@@ -77,7 +77,7 @@ public class AscendListener implements Listener {
         Block block = loc.getBlock();
         Material posm = block.getType();
         isonground.remove(p);
-        if(!fixScaffolding(p, posm)) {
+        if(!fixScaffolding(p, posm) && !plugin.getFaApiListener().getBlock().contains(p)) {
             if (materialAllowed(posm) && !isInBlacklist(p)) {
                 if (getBefore(p) == null) {
                     setBefore(p, loc);
@@ -233,12 +233,13 @@ public class AscendListener implements Listener {
     public void onToggleSneak(PlayerToggleSneakEvent e){
         Player p = e.getPlayer();
         if(plugin.getConfigHandler().getBoolean("SneakingStop") && e.isSneaking() && plugin.getFaApiListener().getInAnimation().contains(p)){
-            plugin.getFaApiListener().getInAnimation().remove(p);
+            plugin.getFaApiListener().cancelAnimation(p);
             needinput.remove(p);
             instantanimation.remove(p);
             apitriggered.remove(p);
             isonground.remove(p);
             wasonground.remove(p);
+            return;
         }
         Material posm = p.getLocation().getBlock().getType();
         double speed = (0.1 * getCustomSpeed(posm));

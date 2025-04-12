@@ -3,8 +3,10 @@ package dev.timecoding.fasterascend.listener;
 import dev.timecoding.fasterascend.FasterAscend;
 import dev.timecoding.fasterascend.config.ConfigHandler;
 import dev.timecoding.fasterascend.event.*;
+import lombok.Getter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -14,6 +16,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class FAApiListener implements Listener {
@@ -23,7 +26,10 @@ public class FAApiListener implements Listener {
 
     //NEW
     private List<Player> inAnimation = new ArrayList<>();
+    @Getter
+    private List<Player> block = new ArrayList<>();
     //
+
 
     public FAApiListener(FasterAscend plugin){
         this.plugin = plugin;
@@ -114,5 +120,30 @@ public class FAApiListener implements Listener {
 
     public List<Player> getInAnimation() {
         return inAnimation;
+    }
+
+    public void addPlayer(Player p){
+        if(!getInAnimation().contains(p) && !block.contains(p)){
+            getInAnimation().remove(p);
+        }
+    }
+
+    public void cancelAnimation(Player player){
+        List<Player> remove = new ArrayList<>();
+        inAnimation.forEach(player1 -> {
+            if(player1.equals(player)){
+                remove.add(player);
+            }
+        });
+        if(!remove.isEmpty()){
+        inAnimation.removeAll(remove);
+        block.add(player);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, new Runnable() {
+            @Override
+            public void run() {
+                block.remove(player);
+            }
+        }, 20);
+        }
     }
 }
