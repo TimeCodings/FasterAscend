@@ -1,5 +1,5 @@
 
-![Faster-Ascend Banner](https://user-images.githubusercontent.com/94994775/210624156-b071867d-0c67-4fd9-9f0f-edc260019c9f.png)
+![Faster-Ascend Banner](https://github.com/user-attachments/assets/ef3b22c5-528c-40dc-8e63-4839a3bebd24)
 ![CodeFactor](https://www.codefactor.io/repository/github/timecodings/fasterascend/badge)
 
 Hey, thanks for viewing this page! Because I found no plugin which allows to ascend faster (climb up ladders faster), I decided to create this Open-Source one! If you found any bugs or errors or if you have wishes, please join my discord and open a ticket: https://discord.gg/XJeAUmbmw9
