@@ -42,16 +42,11 @@ public class AscendListener implements Listener {
 
 
     public void setBefore(Player p, Location loc){
-        if(before.containsKey(p)){
-            before.remove(p);
-        }
         before.put(p, loc);
     }
 
     public void removeBefore(Player p){
-        if(before.containsKey(p)){
-            before.remove(p);
-        }
+        before.remove(p);
     }
 
     public Location getBefore(Player p){
@@ -62,12 +57,10 @@ public class AscendListener implements Listener {
     }
 
     public boolean fixScaffolding(Player p, Material m){
-        Boolean scaffAllowed = plugin.areScaffoldingAllowed();
-        Boolean scaffBugFix = configHandler.getBoolean("FixScaffolding");
-        if(scaffAllowed && scaffBugFix && m.equals(Material.SCAFFOLDING) && p.isSneaking()){
-            return true;
-        }
-        return false;
+        return plugin.areScaffoldingAllowed()
+            && configHandler.getBoolean("FixScaffolding")
+            && m == Material.SCAFFOLDING
+            && p.isSneaking();
     }
 
     @EventHandler
