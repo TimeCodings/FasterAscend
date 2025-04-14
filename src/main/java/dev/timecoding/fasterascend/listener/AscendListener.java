@@ -64,204 +64,164 @@ public class AscendListener implements Listener {
     }
 
     @EventHandler
-    public void onMove(PlayerMoveEvent e){
+    public void onMove(PlayerMoveEvent e) {
         Player p = e.getPlayer();
-        Location loc = p.getEyeLocation().subtract(0,1,0);
-        Block block = loc.getBlock();
-        Material posm = block.getType();
+        Location eyeLoc = p.getEyeLocation().subtract(0, 1, 0);
+        Material blockType = eyeLoc.getBlock().getType();
+    
         isonground.remove(p);
-        if(!fixScaffolding(p, posm) && !plugin.getFaApiListener().getBlock().contains(p)) {
-            if (materialAllowed(posm) && !isInBlacklist(p)) {
-                if (getBefore(p) == null) {
-                    setBefore(p, loc);
-                }
-                Location before = getBefore(p);
-                if (before != loc) {
-                    setBefore(p, loc);
-                    Location subtract = loc.subtract(0, 1, 0);
-                    Material m = subtract.getBlock().getType();
-                    boolean blockIt = false;
-                    if (materialAllowed(m)) {
-                        if (loc.getY() > before.getY() && highIsValid(p)) {
-                            if (!apitriggered.contains(p)) {
-                                blockIt = triggerAPIEvent(FAAPIArg.OnAscendStart, p);
-                                apitriggered.add(p);
-                            }
-                            if (p.getLocation().getY() >= getHighestPointOnLadder(p.getLocation()) - 1) {
-                                if (instantanimation.contains(p)) {
-                                    blockIt = triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationEnd, p);
-                                } else {
-                                    blockIt = triggerAPIEvent(FAAPIArg.OnAscendEnd, p);
-                                }
-                                instantanimation.remove(p);
-                                apitriggered.remove(p);
-                                savedHigh.remove(p);
-                            }
-                            double speed = (0.1 * getCustomSpeed(posm));
-                            if (configHandler.getBoolean("RightClick.Enabled") && wasonground.contains(p) || configHandler.getBoolean("ShiftMode.Enabled") && wasonground.contains(p)) {
-                                if(!blockIt) {
-                                    p.setVelocity(p.getVelocity().setY(speed));
-                                    if (p.getLocation().getY() >= getHighestPointOnLadder(p.getLocation()) - 1) {
-                                        wasonground.remove(p);
-                                    }
-                                }
-                            }
-                            if (!configHandler.getBoolean("InstantClimbUp.Enabled") || configHandler.getBoolean("InstantClimbUp.Enabled") && configHandler.getBoolean("InstantClimbUp.DontDisableNormalBoost") && !wasonground.contains(p)) {
-                                if (needinput.contains(p)) {
-                                    Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (e.getFrom().getY() < e.getTo().getY()) {
-                                                needinput.remove(p);
-                                            }
-                                        }
-                                    }, getCustomDelay(posm));
-                                } else {
-                                    blockIt = triggerAPIEvent(FAAPIArg.OnAscendBoost, p);
-                                    if(!blockIt) {
-                                        p.setVelocity(p.getVelocity().setY(speed));
-                                        needinput.add(p);
-                                    }
-                                }
-                            } else {
-                                if (!configHandler.getBoolean("InstantClimbUp.OnlyOnGround")) {
-                                    if (configHandler.getBoolean("InstantClimbUp.WithAnimation")) {
-                                        if (!instantanimation.contains(p)) {
-                                            blockIt = triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
-                                            instantanimation.add(p);
-                                        }
-                                        if(!blockIt) {
-                                            p.setVelocity(p.getVelocity().setY(speed));
-                                        }
-                                    } else {
-                                        blockIt = triggerAPIEvent(FAAPIArg.OnInstantTeleport, p);
-                                        if(!blockIt) {
-                                            Location location = new Location(p.getWorld(), p.getLocation().getX(), getHighestPointOnLadder(p.getLocation()), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch());
-                                            p.teleport(location);
-                                        }
-                                    }
-                                } else {
-                                    if (configHandler.getBoolean("InstantClimbUp.WithAnimation") && wasonground.contains(p)) {
-                                        if (!instantanimation.contains(p)) {
-                                            blockIt = triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
-                                            instantanimation.add(p);
-                                        }
-                                        if(!blockIt) {
-                                            p.setVelocity(p.getVelocity().setY(speed));
-                                        }
-                                        if (p.getLocation().getY() >= getHighestPointOnLadder(p.getLocation()) - 1) {
-                                            wasonground.remove(p);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else if (getBefore(p) != null) {
-                        isonground.add(p);
-                        removeBefore(p);
-                        double speed = (0.1 * getCustomSpeed(posm));
-                        if (configHandler.getBoolean("InstantClimbUp.Enabled")) {
-                            if (configHandler.getBoolean("InstantClimbUp.OnlyOnGround")) {
-                                if (configHandler.getBoolean("InstantClimbUp.WithAnimation")) {
-                                    if (!instantanimation.contains(p)) {
-                                        if (!instantanimation.contains(p)) {
-                                            blockIt = triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
-                                            instantanimation.add(p);
-                                        }
-                                        instantanimation.add(p);
-                                    }
-                                    if(!blockIt) {
-                                        p.setVelocity(p.getVelocity().setY(speed));
-                                    }
-                                    if (!wasonground.contains(p)) {
-                                        wasonground.add(p);
-                                    }
-                                } else {
-                                    blockIt = triggerAPIEvent(FAAPIArg.OnInstantTeleport, p);
-                                    if(!blockIt) {
-                                        Location location = new Location(p.getWorld(), p.getLocation().getX(), getHighestPointOnLadder(p.getLocation()), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch());
-                                        p.teleport(location);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                wasonground.remove(p);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onRightClick(PlayerInteractEvent e){
-        Player p = e.getPlayer();
-        if(configHandler.getBoolean("RightClick.Enabled") && isonground.contains(p) && !isInBlacklist(p)) {
-            if (configHandler.getBoolean("RightClick.OnlyLeft") && e.getAction() == Action.LEFT_CLICK_BLOCK || configHandler.getBoolean("RightClick.AlsoLeft") && !configHandler.getBoolean("RightClick.OnlyLeft") && e.getAction() == Action.RIGHT_CLICK_BLOCK || configHandler.getBoolean("RightClick.AlsoLeft") && !configHandler.getBoolean("RightClick.OnlyLeft") && e.getAction() == Action.LEFT_CLICK_BLOCK || !configHandler.getBoolean("RightClick.AlsoLeft") && !configHandler.getBoolean("RightClick.OnlyLeft") && e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                 if(configHandler.getBoolean("RightClick.WithShift") && p.isSneaking() || !configHandler.getBoolean("RightClick.WithShift")){
-                     Material posm = e.getClickedBlock().getType();
-                     double speed = (0.1 * getCustomSpeed(posm));
-                     if(materialAllowed(posm)) {
-                         if (configHandler.getBoolean("RightClick.WithAnimation")) {
-                             if(!instantanimation.contains(p)){
-                                 triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
-                                 instantanimation.add(p);
-                             }
-                             p.setVelocity(p.getVelocity().setY(speed));
-                             if (!wasonground.contains(p)) {
-                                 wasonground.add(p);
-                             }
-                         } else {
-                             Location location = new Location(p.getWorld(), p.getLocation().getX(), getHighestPointOnLadder(p.getLocation()), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch());
-                             p.teleport(location);
-                             triggerAPIEvent(FAAPIArg.OnInstantTeleport, p);
-                         }
-                     }
-                 }
-                }
-            }
-    }
-
-    @EventHandler
-    public void onToggleSneak(PlayerToggleSneakEvent e){
-        Player p = e.getPlayer();
-        if(plugin.getConfigHandler().getBoolean("SneakingStop") && e.isSneaking() && plugin.getFaApiListener().getInAnimation().contains(p)){
-            plugin.getFaApiListener().cancelAnimation(p);
-            needinput.remove(p);
-            instantanimation.remove(p);
-            apitriggered.remove(p);
-            isonground.remove(p);
+    
+        if (fixScaffolding(p, blockType) || plugin.getFaApiListener().getBlock().contains(p) || !materialAllowed(blockType) || isInBlacklist(p)) {
             wasonground.remove(p);
             return;
         }
-        Material posm = p.getLocation().getBlock().getType();
-        double speed = (0.1 * getCustomSpeed(posm));
-        boolean blockIt = false;
-        if(configHandler.getBoolean("ShiftMode.Enabled") && !isInBlacklist(p)){
-        if(materialAllowed(posm)) {
-            if(!isonground.contains(p) && !wasonground.contains(p)){
-                if (configHandler.getBoolean("ShiftMode.WithAnimation")) {
-                    if(!instantanimation.contains(p)){
-                        blockIt = triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
-                        instantanimation.add(p);
-                    }
-                    if(!blockIt) {
-                        p.setVelocity(p.getVelocity().setY(speed));
-                    }
-                    if (!wasonground.contains(p)) {
-                        wasonground.add(p);
-                    }
-                } else {
-                    blockIt = triggerAPIEvent(FAAPIArg.OnInstantTeleport, p);
-                    if(!blockIt) {
-                        Location location = new Location(p.getWorld(), p.getLocation().getX(), getHighestPointOnLadder(p.getLocation()), p.getLocation().getZ(), p.getLocation().getYaw(), p.getLocation().getPitch());
-                        p.teleport(location);
-                    }
-                }
-            }
+    
+        Location beforeLoc = getBefore(p);
+        if (beforeLoc == null || !beforeLoc.equals(eyeLoc)) {
+            setBefore(p, eyeLoc);
         }
+    
+        if (beforeLoc != null && eyeLoc.getY() > beforeLoc.getY() && highIsValid(p)) {
+            handleAscendLogic(p, e, blockType);
+        } else if (beforeLoc != null && !materialAllowed(eyeLoc.subtract(0, 1, 0).getBlock().getType())) {
+            handleReachTop(p, blockType);
         }
     }
+
+private void handleAscendLogic(Player p, PlayerMoveEvent e, Material blockType) {
+    boolean blockIt = false;
+    double speed = 0.1 * getCustomSpeed(blockType);
+
+    if (!apitriggered.contains(p)) {
+        blockIt = triggerAPIEvent(FAAPIArg.OnAscendStart, p);
+        apitriggered.add(p);
+    }
+
+    if (atTop(p)) {
+        blockIt = handleAscendEnd(p);
+    }
+
+    if (shouldUseStandardBoost(p)) {
+        if (!blockIt) {
+            p.setVelocity(p.getVelocity().setY(speed));
+            if (atTop(p)) wasonground.remove(p);
+        }
+    }
+
+    if (shouldUseInstantClimb(p)) {
+        if (needinput.contains(p)) {
+            Bukkit.getScheduler().runTaskLater(plugin, () - > {
+                if (e.getFrom().getY() < e.getTo().getY()) {
+                    needinput.remove(p);
+                }
+            }, getCustomDelay(blockType));
+        } else {
+            blockIt = triggerAPIEvent(FAAPIArg.OnAscendBoost, p);
+            if (!blockIt) {
+                p.setVelocity(p.getVelocity().setY(speed));
+                needinput.add(p);
+            }
+        }
+    } else {
+        handleInstantBoostOrTeleport(p, blockType, speed);
+    }
+}
+
+private void handleReachTop(Player p, Material blockType) {
+    isonground.add(p);
+    removeBefore(p);
+    double speed = 0.1 * getCustomSpeed(blockType);
+    boolean blockIt = false;
+
+    if (configHandler.getBoolean("InstantClimbUp.Enabled") && configHandler.getBoolean("InstantClimbUp.OnlyOnGround")) {
+        if (configHandler.getBoolean("InstantClimbUp.WithAnimation")) {
+            if (!instantanimation.contains(p)) {
+                blockIt = triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
+                instantanimation.add(p);
+            }
+            if (!blockIt) p.setVelocity(p.getVelocity().setY(speed));
+            wasonground.add(p);
+        } else {
+            blockIt = triggerAPIEvent(FAAPIArg.OnInstantTeleport, p);
+            if (!blockIt) teleportToTop(p);
+        }
+    }
+}
+
+@EventHandler
+public void onRightClick(PlayerInteractEvent e) {
+    Player p = e.getPlayer();
+
+    if (!configHandler.getBoolean("RightClick.Enabled") || !isonground.contains(p) || isInBlacklist(p) || !isValidClick(e, p)) return;
+
+    Material clicked = e.getClickedBlock().getType();
+    if (!materialAllowed(clicked)) return;
+
+    double speed = 0.1 * getCustomSpeed(clicked);
+
+    if (configHandler.getBoolean("RightClick.WithAnimation")) {
+        if (!instantanimation.contains(p)) {
+            triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
+            instantanimation.add(p);
+        }
+        p.setVelocity(p.getVelocity().setY(speed));
+        wasonground.add(p);
+    } else {
+        teleportToTop(p);
+        triggerAPIEvent(FAAPIArg.OnInstantTeleport, p);
+    }
+}
+
+private boolean isValidClick(PlayerInteractEvent e, Player p) {
+    boolean onlyLeft = configHandler.getBoolean("RightClick.OnlyLeft");
+    boolean alsoLeft = configHandler.getBoolean("RightClick.AlsoLeft");
+    boolean withShift = configHandler.getBoolean("RightClick.WithShift");
+
+    Action action = e.getAction();
+    boolean validAction = onlyLeft ? action == Action.LEFT_CLICK_BLOCK
+            : alsoLeft ? action == Action.LEFT_CLICK_BLOCK || action == Action.RIGHT_CLICK_BLOCK
+            : action == Action.RIGHT_CLICK_BLOCK;
+
+    return validAction && (!withShift || p.isSneaking());
+}
+
+    @EventHandler
+public void onToggleSneak(PlayerToggleSneakEvent e) {
+    Player p = e.getPlayer();
+    if (plugin.getConfigHandler().getBoolean("SneakingStop") && e.isSneaking() && plugin.getFaApiListener().getInAnimation().contains(p)) {
+        cancelAll(p);
+        return;
+    }
+
+    if (!configHandler.getBoolean("ShiftMode.Enabled") || isInBlacklist(p)) return;
+
+    Material posm = p.getLocation().getBlock().getType();
+    if (!materialAllowed(posm) || isonground.contains(p) || wasonground.contains(p)) return;
+
+    double speed = 0.1 * getCustomSpeed(posm);
+    boolean blockIt = false;
+
+    if (configHandler.getBoolean("ShiftMode.WithAnimation")) {
+        if (!instantanimation.contains(p)) {
+            blockIt = triggerAPIEvent(FAAPIArg.OnInstantAscendAnimationStart, p);
+            instantanimation.add(p);
+        }
+        if (!blockIt) p.setVelocity(p.getVelocity().setY(speed));
+        wasonground.add(p);
+    } else {
+        blockIt = triggerAPIEvent(FAAPIArg.OnInstantTeleport, p);
+        if (!blockIt) teleportToTop(p);
+    }
+}
+
+private void cancelAll(Player p) {
+    plugin.getFaApiListener().cancelAnimation(p);
+    needinput.remove(p);
+    instantanimation.remove(p);
+    apitriggered.remove(p);
+    isonground.remove(p);
+    wasonground.remove(p);
+}
 
     public boolean materialAllowed(Material posm){
         if(configHandler.getBoolean("Blocks.Ladders") && posm == Material.LADDER || configHandler.getBoolean("Blocks.Vines") && posm == Material.VINE || configHandler.getBoolean("Blocks.Water") && posm == Material.WATER){
@@ -463,7 +423,10 @@ public class AscendListener implements Listener {
                 sender.sendMessage("§aA newer version of the plugin §eFasterAscend §ais already available! §e(Version §c" + plugin.getUpdateChecker().getLatestVersion() + "§e)");
                 sender.sendMessage("§aFor the best experience download it here: §ehttps://www.spigotmc.org/resources/faster-ascend.107195/");
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+                    plugin.getLogger().warning("Failed to check updates for player: " + p.getName());
+
+        }
     }
 
 }
