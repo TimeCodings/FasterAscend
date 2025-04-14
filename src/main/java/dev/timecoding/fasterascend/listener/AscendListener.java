@@ -423,24 +423,14 @@ public class AscendListener implements Listener {
     }
 
     public boolean isInBlacklist(Player p){
-        if(configHandler.getBoolean("Blacklist.Enabled")){
-            String worldname = p.getWorld().getName();
-            List<String> list = configHandler.getConfig().getStringList("Blacklist.Worlds");
-            if(configHandler.getBoolean("Blacklist.ToWhitelist")){
-                if(list.contains(worldname)){
-                    return false;
-                }else{
-                    return true;
-                }
-            }else{
-                if(list.contains(worldname)){
-                    return true;
-                }else{
-                    return false;
-                }
-            }
-        }
-        return false;
+        if (!configHandler.getBoolean("Blacklist.Enabled")) return false;
+    
+        String world = p.getWorld().getName();
+        List<String> list = configHandler.getConfig().getStringList("Blacklist.Worlds");
+    
+        boolean isWhitelisted = configHandler.getBoolean("Blacklist.ToWhitelist");
+    
+        return isWhitelisted ? !list.contains(world) : list.contains(world);
     }
 
     public Integer getCustomDelay(Material m){
